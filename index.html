@@ -883,7 +883,7 @@ function renderDeskQuestions() {
     btn.className = 'q-btn' + (q.isLocked ? ' locked' : '');
     btn.innerHTML = `
       <span class="q-icon">${q.isLocked ? '🔒' : '💬'}</span>
-      <span class="q-text">${q.text}</span>
+      <span class="q-text">${q.isLocked ? '잠겨있는 질문입니다.' : q.text}</span>
       <span class="q-badge">${q.isLocked ? '잠김' : '질문 가능'}</span>
     `;
     if (!q.isLocked) {
