@@ -172,11 +172,77 @@ body{background:var(--bg);color:var(--tp);font-family:Georgia,Batang,serif;min-h
 #notif.show{transform:translateX(-50%) translateY(0)}
 #notif.error{border-color:var(--red);box-shadow:var(--sr)}
 
+/* ── RESPONSIVE: 태블릿 (900px 이하) ── */
+@media(max-width:899px){
+  #gameArea.active{display:flex;flex-direction:column;padding:12px;gap:12px}
+  #interrogationDesk{grid-column:unset}
+  #cardList{max-height:300px}
+  .inv-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+}
+
+/* ── RESPONSIVE: 모바일 (600px 이하) ── */
 @media(max-width:600px){
-  .modal-box{padding:32px 24px}
+  /* 모달 */
+  .modal-box{padding:28px 20px}
+  .modal-box h1{font-size:1.3rem}
+
+  /* 탑바 */
+  #topBar{padding:8px 12px;flex-wrap:wrap;gap:6px}
+  .gtitle{display:none}
+  .top-left{gap:10px}
+  .pbadge{font-size:.75rem}
+  .rdisplay{font-size:.75rem}
+  .rdisplay .rnum{font-size:.95rem}
+  .btn-accuse{padding:6px 12px;font-size:.72rem;letter-spacing:.05em}
+
+  /* 게임 영역 */
+  #gameArea.active{padding:8px;gap:8px}
+
+  /* 장소 탭 */
+  .loc-tab{padding:8px 10px;font-size:.72rem;letter-spacing:.03em}
+  .loc-content{padding:14px}
+  .loc-name{font-size:.95rem}
+  .loc-desc{font-size:.8rem;margin-bottom:14px}
+  .inv-grid{grid-template-columns:1fr 1fr;gap:6px}
+  .inv-btn{padding:8px 10px;font-size:.78rem}
+
+  /* 로그 */
+  #logContent{height:160px;font-size:.8rem}
+
+  /* 인벤토리 */
+  #cardList{max-height:220px}
+  .card{padding:8px 10px}
+  .cname{font-size:.8rem}
+  .cdesc{font-size:.72rem}
+  .combo-sec{padding:10px}
+  .btn-combine{padding:9px;font-size:.75rem}
+
+  /* 심문 데스크 */
+  .desk-tab{font-size:.72rem;padding:8px 6px}
+  .desk-header-sub{display:none}
+  .q-btn{font-size:.78rem;padding:8px 10px}
+
+  /* 최종 추리 */
+  #accusePage{margin:20px auto;padding:12px}
+  .ah h2{font-size:1.4rem}
   .sgrid{grid-template-columns:1fr}
-  .prolog-box{padding:32px 20px}
-  .asec{padding:16px}
+  .asec{padding:14px}
+  .scard{padding:12px 8px}
+  .sicon{font-size:1.5rem}
+
+  /* 프롤로그 */
+  .prolog-box{padding:24px 16px}
+  .prolog-box h2{font-size:1.1rem}
+  .prolog-text{font-size:.83rem}
+
+  /* 엔딩 */
+  .etitle{font-size:1.6rem}
+  .etext{font-size:.9rem}
+  .edetail{font-size:.8rem;padding:14px}
+  .eicon{font-size:3.5rem}
+
+  /* 알림 */
+  #notif{max-width:90%;font-size:.8rem;padding:10px 16px}
 }
 /* ══ INTERROGATION DESK ══ */
 #interrogationDesk{grid-column:2;background:var(--bgp);border:1px solid var(--bdra);border-radius:4px;overflow:hidden;margin-top:16px}
