@@ -1,0 +1,917 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>뮤지컬 극장 살인사건</title>
+<style>
+:root{
+  --bg:#0a0a0a;--bg2:#111111;--bgc:#1a1a1a;--bgp:#141414;
+  --bdr:#2a2a2a;--bdra:#8b1a1a;
+  --tp:#e8e0d0;--ts:#9a9080;--tm:#5a5248;
+  --red:#c0392b;--redb:#e74c3c;
+  --gold:#b8860b;--goldb:#d4a017;--goldl:#f0c040;
+  --sg:0 0 15px rgba(184,134,11,.3);
+  --sr:0 0 15px rgba(192,57,43,.3);
+  --sh:0 4px 20px rgba(0,0,0,.8)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tp);font-family:Georgia,Batang,serif;min-height:100vh;overflow-x:hidden}
+
+/* ── MODAL ── */
+#startModal{position:fixed;inset:0;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px)}
+.modal-box{background:var(--bgc);border:1px solid var(--gold);border-radius:4px;padding:48px 40px;max-width:480px;width:90%;box-shadow:var(--sg),var(--sh);text-align:center}
+.modal-box .ci{font-size:48px;margin-bottom:16px;filter:drop-shadow(0 0 8px rgba(184,134,11,.6))}
+.modal-box h1{font-size:1.6rem;color:var(--goldb);letter-spacing:.1em;margin-bottom:8px;text-shadow:0 0 20px rgba(212,160,23,.5)}
+.modal-box .sub{font-size:.85rem;color:var(--ts);letter-spacing:.2em;margin-bottom:32px;font-style:italic}
+.modal-box label{display:block;text-align:left;font-size:.8rem;color:var(--gold);letter-spacing:.15em;margin-bottom:6px;margin-top:16px}
+.modal-box input[type=text]{width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--bdr);border-radius:2px;color:var(--tp);font-family:inherit;font-size:1rem;outline:none;transition:border-color .2s}
+.modal-box input[type=text]:focus{border-color:var(--gold)}
+.gg{display:flex;gap:12px;margin-top:6px}
+.gg label{flex:1;margin:0;padding:10px;border:1px solid var(--bdr);border-radius:2px;cursor:pointer;text-align:center;font-size:.9rem;color:var(--ts);transition:all .2s;letter-spacing:.05em}
+.gg input[type=radio]{display:none}
+.gg input[type=radio]:checked+label{border-color:var(--gold);color:var(--goldb);background:rgba(184,134,11,.1)}
+.btn-start{margin-top:28px;width:100%;padding:14px;background:var(--red);border:none;border-radius:2px;color:#fff;font-family:inherit;font-size:1rem;letter-spacing:.2em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-start:hover{background:var(--redb);box-shadow:var(--sr)}
+.gold-line{width:60px;height:1px;background:var(--gold);margin:12px auto}
+
+/* ── PROLOG ── */
+#prologPage{display:none;min-height:100vh;align-items:center;justify-content:center;padding:40px 20px}
+#prologPage.active{display:flex}
+.prolog-box{max-width:680px;width:100%;background:var(--bgc);border:1px solid var(--gold);border-radius:4px;padding:48px 40px;box-shadow:var(--sg)}
+.prolog-box h2{font-size:1.3rem;color:var(--goldb);letter-spacing:.1em;margin-bottom:24px;text-align:center}
+.prolog-text{font-size:.9rem;line-height:2.1;color:var(--ts);margin-bottom:24px}
+.prolog-text strong{color:var(--tp)}
+.prolog-suspects{background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;padding:16px;margin-bottom:24px}
+.prolog-suspects h3{font-size:.75rem;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px}
+.srow{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;font-size:.83rem;line-height:1.6}
+.srow .si{font-size:1.2rem;flex-shrink:0}
+.srow .sn{color:var(--tp);font-weight:bold}
+.srow .sd{color:var(--ts)}
+.btn-enter{width:100%;padding:14px;background:var(--red);border:none;border-radius:2px;color:#fff;font-family:inherit;font-size:.9rem;letter-spacing:.2em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-enter:hover{background:var(--redb);box-shadow:var(--sr)}
+
+/* ── TOP BAR ── */
+#topBar{display:none;position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--bdra);padding:10px 20px;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,.6)}
+#topBar.active{display:flex}
+.top-left{display:flex;align-items:center;gap:16px}
+.pbadge{font-size:.85rem;color:var(--gold);letter-spacing:.1em}
+.pbadge span{color:var(--tp)}
+.rdisplay{font-size:.85rem;color:var(--ts);letter-spacing:.1em}
+.rdisplay .rnum{font-size:1.1rem;color:var(--goldb);font-weight:bold}
+.rdisplay .rwarn{color:var(--redb)}
+.gtitle{font-size:.9rem;color:var(--tm);letter-spacing:.2em;font-style:italic}
+.btn-accuse{padding:8px 20px;background:transparent;border:1px solid var(--red);border-radius:2px;color:var(--redb);font-family:inherit;font-size:.8rem;letter-spacing:.15em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-accuse:hover{background:var(--red);color:#fff;box-shadow:var(--sr)}
+
+/* ── GAME AREA ── */
+#gameArea{display:none;max-width:1400px;margin:0 auto;padding:20px;gap:16px}
+#gameArea.active{display:grid;grid-template-columns:1fr 340px;align-items:start}
+@media(max-width:899px){#gameArea.active{display:flex;flex-direction:column}}
+
+/* ── LOCATION PANEL ── */
+#locationPanel{background:var(--bgp);border:1px solid var(--bdr);border-radius:4px;overflow:hidden}
+.loc-tabs{display:flex;overflow-x:auto;border-bottom:1px solid var(--bdr);background:var(--bg2);scrollbar-width:none}
+.loc-tabs::-webkit-scrollbar{display:none}
+.loc-tab{padding:10px 16px;white-space:nowrap;background:transparent;border:none;color:var(--tm);font-family:inherit;font-size:.78rem;letter-spacing:.1em;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;flex-shrink:0}
+.loc-tab:hover{color:var(--ts)}
+.loc-tab.active{color:var(--goldb);border-bottom-color:var(--gold);background:rgba(184,134,11,.05)}
+.loc-content{padding:20px}
+.loc-name{font-size:1.1rem;color:var(--goldb);letter-spacing:.1em;margin-bottom:8px}
+.loc-desc{font-size:.85rem;color:var(--ts);line-height:1.7;margin-bottom:20px;font-style:italic;border-left:2px solid var(--bdra);padding-left:12px}
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.inv-btn{padding:10px 14px;text-align:left;background:var(--bgc);border:1px solid var(--bdr);border-radius:2px;color:var(--tp);font-family:inherit;font-size:.82rem;cursor:pointer;transition:all .2s;line-height:1.4}
+.inv-btn:hover:not(:disabled){border-color:var(--gold);color:var(--goldl);background:rgba(184,134,11,.08)}
+.inv-btn:disabled{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+.inv-btn .bnum{font-size:.7rem;color:var(--gold);display:block;margin-bottom:2px}
+
+/* ── LOG PANEL ── */
+#logPanel{background:var(--bgp);border:1px solid var(--bdr);border-radius:4px;overflow:hidden;margin-top:16px}
+.ph{padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--bdr);font-size:.75rem;color:var(--gold);letter-spacing:.2em;text-transform:uppercase}
+#logContent{height:220px;overflow-y:auto;padding:16px;font-size:.85rem;line-height:1.8;color:var(--ts);scrollbar-width:thin;scrollbar-color:var(--bdr) transparent}
+#logContent::-webkit-scrollbar{width:4px}
+#logContent::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.le{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(42,42,42,.5)}
+.le:last-child{border-bottom:none}
+.le.clue{color:var(--goldl)}
+.le.item{color:#7ec8e3}
+.le.testimony{color:#a8d8a8}
+.le.combo{color:var(--goldb);font-weight:bold}
+.le.system{color:var(--tm);font-style:italic}
+.le.fail{color:var(--redb)}
+.le .lt{font-size:.7rem;color:var(--tm);margin-right:8px}
+
+/* ── INVENTORY PANEL ── */
+#inventoryPanel{background:var(--bgp);border:1px solid var(--bdr);border-radius:4px;overflow:hidden;display:flex;flex-direction:column}
+.iph{padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.iph span{font-size:.75rem;color:var(--gold);letter-spacing:.2em;text-transform:uppercase}
+.icnt{font-size:.75rem;color:var(--tm);background:var(--bgc);padding:2px 8px;border-radius:10px;border:1px solid var(--bdr)}
+#cardList{flex:1;overflow-y:auto;padding:12px;scrollbar-width:thin;scrollbar-color:var(--bdr) transparent;min-height:200px;max-height:500px}
+#cardList::-webkit-scrollbar{width:4px}
+#cardList::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.card{background:var(--bgc);border:1px solid var(--bdr);border-radius:3px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
+.card:hover{border-color:var(--gold)}
+.card.selected{border-color:var(--goldb);background:rgba(184,134,11,.12);box-shadow:0 0 8px rgba(184,134,11,.3)}
+.ctype{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
+.ctype.clue{color:var(--gold)}
+.ctype.item{color:#7ec8e3}
+.ctype.testimony{color:#a8d8a8}
+.ctype.combo{color:var(--goldb)}
+.cname{font-size:.85rem;color:var(--tp);line-height:1.4;margin-bottom:4px}
+.cdesc{font-size:.75rem;color:var(--ts);line-height:1.5;font-style:italic}
+.csbadge{position:absolute;top:6px;right:8px;font-size:.65rem;color:var(--goldb);background:rgba(184,134,11,.2);padding:1px 6px;border-radius:8px;border:1px solid var(--gold)}
+.combo-sec{padding:12px;border-top:1px solid var(--bdr);background:var(--bg2)}
+.combo-hint{font-size:.72rem;color:var(--tm);margin-bottom:8px;line-height:1.5}
+.btn-combine{width:100%;padding:10px;background:transparent;border:1px solid var(--gold);border-radius:2px;color:var(--goldb);font-family:inherit;font-size:.8rem;letter-spacing:.15em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-combine:hover:not(:disabled){background:rgba(184,134,11,.15);box-shadow:var(--sg)}
+.btn-combine:disabled{opacity:.3;cursor:not-allowed}
+.empty-inv{text-align:center;padding:40px 20px;color:var(--tm);font-size:.8rem;font-style:italic;line-height:1.8}
+
+/* ── ACCUSE PAGE ── */
+#accusePage{display:none;max-width:700px;margin:40px auto;padding:20px}
+#accusePage.active{display:block}
+.ah{text-align:center;margin-bottom:32px}
+.ah h2{font-size:1.8rem;color:var(--goldb);letter-spacing:.1em;margin-bottom:8px;text-shadow:0 0 20px rgba(212,160,23,.4)}
+.ah p{color:var(--ts);font-style:italic;font-size:.9rem}
+.asec{background:var(--bgc);border:1px solid var(--bdr);border-radius:4px;padding:24px;margin-bottom:20px}
+.asec h3{font-size:.8rem;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--bdr)}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.scard{padding:16px 12px;text-align:center;background:var(--bg2);border:2px solid var(--bdr);border-radius:3px;cursor:pointer;transition:all .2s}
+.scard:hover{border-color:var(--red)}
+.scard.selected{border-color:var(--redb);background:rgba(192,57,43,.12);box-shadow:var(--sr)}
+.sicon{font-size:2rem;margin-bottom:8px}
+.sname{font-size:.9rem;color:var(--tp);margin-bottom:4px}
+.srole{font-size:.72rem;color:var(--tm);font-style:italic}
+.elist{display:flex;flex-direction:column;gap:8px}
+.eitem{padding:10px 14px;background:var(--bg2);border:1px solid var(--bdr);border-radius:2px;cursor:pointer;transition:all .2s;font-size:.85rem}
+.eitem:hover{border-color:var(--gold)}
+.eitem.selected{border-color:var(--goldb);background:rgba(184,134,11,.1)}
+.eitem .et{font-size:.65rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.no-ev{color:var(--tm);font-style:italic;font-size:.85rem;padding:12px;text-align:center}
+.btn-verdict{width:100%;padding:16px;background:var(--red);border:none;border-radius:2px;color:#fff;font-family:inherit;font-size:1rem;letter-spacing:.2em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-verdict:hover:not(:disabled){background:var(--redb);box-shadow:var(--sr)}
+.btn-verdict:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── ENDING ── */
+#endingPage{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;padding:40px 20px;text-align:center}
+#endingPage.active{display:flex}
+.ending-true{background:radial-gradient(ellipse at center,#0a1a0a 0%,#000 70%)}
+.ending-bad{background:radial-gradient(ellipse at center,#1a0a0a 0%,#000 70%)}
+.eicon{font-size:5rem;margin-bottom:24px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:.8}}
+.etitle{font-size:2.2rem;letter-spacing:.15em;margin-bottom:16px;text-shadow:0 0 30px currentColor}
+.ending-true .etitle{color:var(--goldb)}
+.ending-bad .etitle{color:var(--redb)}
+.etext{max-width:600px;font-size:1rem;line-height:2;color:var(--ts);margin-bottom:32px;font-style:italic}
+.edetail{max-width:600px;font-size:.85rem;line-height:1.9;color:var(--tm);margin-bottom:40px;background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:4px;padding:20px;text-align:left}
+.btn-restart{padding:12px 40px;background:transparent;border:1px solid var(--gold);border-radius:2px;color:var(--goldb);font-family:inherit;font-size:.9rem;letter-spacing:.2em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-restart:hover{background:rgba(184,134,11,.15);box-shadow:var(--sg)}
+
+/* ── NOTIFICATION ── */
+#notif{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bgc);border:1px solid var(--gold);border-radius:3px;padding:12px 24px;font-size:.85rem;color:var(--tp);z-index:500;transition:transform .3s ease;box-shadow:var(--sg);max-width:400px;text-align:center;pointer-events:none}
+#notif.show{transform:translateX(-50%) translateY(0)}
+#notif.error{border-color:var(--red);box-shadow:var(--sr)}
+
+@media(max-width:600px){
+  .modal-box{padding:32px 24px}
+  .sgrid{grid-template-columns:1fr}
+  .prolog-box{padding:32px 20px}
+  .asec{padding:16px}
+}
+/* ══ INTERROGATION DESK ══ */
+#interrogationDesk{grid-column:2;background:var(--bgp);border:1px solid var(--bdra);border-radius:4px;overflow:hidden;margin-top:16px}
+.desk-header{padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--bdra);display:flex;align-items:center;justify-content:space-between}
+.desk-header-title{font-size:.75rem;color:var(--redb);letter-spacing:.2em;text-transform:uppercase}
+.desk-header-sub{font-size:.7rem;color:var(--tm);font-style:italic}
+.desk-suspects{display:flex;gap:0;border-bottom:1px solid var(--bdr)}
+.desk-tab{flex:1;padding:10px 8px;background:transparent;border:none;border-right:1px solid var(--bdr);color:var(--tm);font-family:inherit;font-size:.78rem;letter-spacing:.05em;cursor:pointer;transition:all .2s;text-align:center}
+.desk-tab:last-child{border-right:none}
+.desk-tab:hover{color:var(--ts);background:rgba(255,255,255,.02)}
+.desk-tab.active{color:var(--redb);background:rgba(192,57,43,.06);border-bottom:2px solid var(--red)}
+.desk-questions{padding:12px;display:flex;flex-direction:column;gap:8px;min-height:80px}
+.q-btn{padding:10px 14px;text-align:left;background:var(--bgc);border:1px solid var(--bdr);border-radius:2px;color:var(--tp);font-family:inherit;font-size:.82rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;line-height:1.4}
+.q-btn:hover:not(.locked){border-color:var(--redb);background:rgba(192,57,43,.06)}
+.q-btn.locked{opacity:.5;cursor:not-allowed;color:var(--tm)}
+.q-btn .q-icon{font-size:1rem;flex-shrink:0}
+.q-btn .q-text{flex:1}
+.q-btn .q-badge{font-size:.65rem;padding:2px 7px;border-radius:8px;flex-shrink:0}
+.q-btn.locked .q-badge{background:rgba(90,82,72,.2);color:var(--tm);border:1px solid var(--bdr)}
+.q-btn:not(.locked) .q-badge{background:rgba(192,57,43,.15);color:var(--redb);border:1px solid var(--bdra)}
+.desk-empty{text-align:center;padding:20px;color:var(--tm);font-size:.78rem;font-style:italic}
+</style>
+</head>
+<body>
+
+<!-- ══ START MODAL ══ -->
+<div id="startModal">
+  <div class="modal-box">
+    <div class="ci">🎭</div>
+    <h1>막이 내리기 전에</h1>
+    <p class="sub">— 뮤지컬 극장 살인사건 —</p>
+    <div class="gold-line"></div>
+    <label for="pname">당신의 이름</label>
+    <input type="text" id="pname" placeholder="이름을 입력하세요" maxlength="12">
+    <label>성별</label>
+    <div class="gg">
+      <input type="radio" name="gender" id="gM" value="남성" checked>
+      <label for="gM">남성</label>
+      <input type="radio" name="gender" id="gF" value="여성">
+      <label for="gF">여성</label>
+    </div>
+    <button class="btn-start" onclick="startGame()">수사 개시</button>
+  </div>
+</div>
+
+<!-- ══ PROLOG PAGE ══ -->
+<div id="prologPage">
+  <div class="prolog-box">
+    <h2>🎭 사건 개요</h2>
+    <div class="prolog-text" id="prologText"></div>
+    <div class="prolog-suspects">
+      <h3>▸ 주요 용의자</h3>
+      <div class="srow"><span class="si">💼</span><div><span class="sn">최민혁</span> — <span class="sd">투자사 대표. 극단의 최대 투자자.</span></div></div>
+      <div class="srow"><span class="si">🎭</span><div><span class="sn">김서연</span> — <span class="sd">주연 배우. 박 감독의 애착 주연 배우.</span></div></div>
+      <div class="srow"><span class="si">🎬</span><div><span class="sn">정진우</span> — <span class="sd">무대 기술 감독. 뮤지컬 최고 감독자.</span></div></div>
+    </div>
+    <button class="btn-enter" onclick="enterGame()">▶ 수사 시작</button>
+  </div>
+</div>
+
+<!-- ══ TOP BAR ══ -->
+<div id="topBar">
+  <div class="top-left">
+    <div class="pbadge" id="playerBadge"></div>
+    <div class="rdisplay">라운드 <span class="rnum" id="roundNum">1</span> / 15</div>
+  </div>
+  <div class="gtitle">막이 내리기 전에</div>
+  <button class="btn-accuse" onclick="goAccuse()">⚖ 최종 범인 지목</button>
+</div>
+
+<!-- ══ GAME AREA ══ -->
+<div id="gameArea">
+  <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+    <!-- 장소 패널 -->
+    <div id="locationPanel">
+      <div class="loc-tabs" id="locTabs"></div>
+      <div class="loc-content" id="locContent"></div>
+    </div>
+    <!-- 로그 패널 -->
+    <div id="logPanel">
+      <div class="ph">📋 수사 일지</div>
+      <div id="logContent"></div>
+    </div>
+  </div>
+  <!-- 인벤토리 패널 -->
+  <div id="inventoryPanel">
+    <div class="iph">
+      <span>🗂 증거 인벤토리</span>
+      <span class="icnt" id="invCount">0</span>
+    </div>
+    <div id="cardList">
+      <div class="empty-inv">아직 수집된 단서가 없습니다.<br>현장을 조사하세요.</div>
+    </div>
+    <div class="combo-sec">
+      <div class="combo-hint" id="comboHint">카드 2장을 선택하면 조합을 시도할 수 있습니다.</div>
+      <button class="btn-combine" id="btnCombine" disabled onclick="tryCombine()">🔗 조합하기</button>
+    </div>
+  </div>
+  <!-- 심문 데스크 -->
+  <!-- ══ INTERROGATION DESK ══ -->
+  <div id="interrogationDesk" style="display:none">
+    <div class="desk-header">
+      <span class="desk-header-title">🔍 용의자 심문 데스크</span>
+      <span class="desk-header-sub">확보한 증거로 질문이 해금됩니다</span>
+    </div>
+    <div class="desk-suspects" id="deskTabs"></div>
+    <div class="desk-questions" id="deskQuestions"></div>
+  </div>
+</div>
+
+<!-- ══ ACCUSE PAGE ══ -->
+<div id="accusePage">
+  <div class="ah">
+    <h2>⚖ 최종 추리</h2>
+    <p>모든 단서를 검토하고 진범을 지목하십시오.</p>
+  </div>
+  <div class="asec">
+    <h3>▸ 범인은 누구인가?</h3>
+    <div class="sgrid">
+      <div class="scard" id="sc_choi" onclick="selectSuspect('최민혁')">
+        <div class="sicon">💼</div>
+        <div class="sname">최민혁</div>
+        <div class="srole">투자사 대표</div>
+      </div>
+      <div class="scard" id="sc_kim" onclick="selectSuspect('김서연')">
+        <div class="sicon">🎭</div>
+        <div class="sname">김서연</div>
+        <div class="srole">주연 배우</div>
+      </div>
+      <div class="scard" id="sc_jung" onclick="selectSuspect('정진우')">
+        <div class="sicon">🎬</div>
+        <div class="sname">정진우</div>
+        <div class="srole">무대 기술 감독</div>
+      </div>
+    </div>
+  </div>
+  <div class="asec">
+    <h3>▸ 결정적 증거를 제시하세요.</h3>
+    <div class="elist" id="evidenceList"></div>
+  </div>
+  <button class="btn-verdict" id="btnVerdict" disabled onclick="submitVerdict()">범인 지목하기</button>
+</div>
+
+<!-- ══ ENDING PAGE ══ -->
+<div id="endingPage">
+  <div class="eicon" id="endIcon"></div>
+  <div class="etitle" id="endTitle"></div>
+  <div class="etext" id="endText"></div>
+  <div class="edetail" id="endDetail"></div>
+  <button class="btn-restart" onclick="location.reload()">↺ 다시 시작</button>
+</div>
+
+<div id="notif"></div>
+
+<script>
+// ══════════════════════════════════════════
+// STEP 3: 게임 데이터 + 상태 + 초기화 + 장소/조사 로직
+// ══════════════════════════════════════════
+
+const LOCATIONS = [
+  {
+    id: 'office', name: '사건 현장: 박 감독 집무실',
+    desc: '박태준 감독이 숨진 채 발견된 집무실. 무거운 정적이 감돈다. 창문은 안에서 잠겨 있었다.',
+    items: [
+      { id: '11', label: '박태준의 사체',    type: 'clue',     name: '시신 검시 결과',       desc: '밧줄에 목이 매여 구석에 굳어 있는 박 감독의 시체다. 목에는 밧줄 자국이 선명하지만, 머리 뒤쪽에도 무언가에 강하게 부딪힌 듯한 거친 멍 자국이 나 있다.' },
+      { id: '12', label: '집무실 벽면',      type: 'clue',     name: '벽면 혈흔',            desc: '사체가 매달린 곳 바로 옆 벽면이다. 머리 높이쯤에 무언가 문질러진 듯한 핏자국이 길게 얼룩져 있다.' },
+      { id: '13', label: '원목 책상',        type: 'clue',     name: '책상 위 서류',         desc: '거액의 사채 독촉장과 박 감독의 필체로 적힌 짧은 유서가 어지럽게 널려 있다. 책상 한구석에는 아주 미세하고 하얀 종이 재 조각들이 조금 떨어져 있다.' },
+      { id: '14', label: '박살 난 태블릿',   type: 'item',     name: '방전된 태블릿 PC',     desc: '가죽 소파 아래 어두운 구석에 박 감독의 태블릿 PC가 처박혀 있다. 액정에 금이 가 있고, 배터리가 방전되어 있는 상태이다.' },
+      { id: '15', label: '황동 트로피',      type: 'clue',     name: '황동 트로피',          desc: '박 감독이 작년에 받은 뮤지컬 대상 황동 트로피다. 묵직한 황동 재질로 만들어져 있으며, 장식장 한가운데에 진열되어 있다.' }
+    ]
+  },
+  {
+    id: 'parking', name: '로비 주변: VIP 전용 주차장',
+    desc: '극장 VIP 전용 주차장. 오늘 개막 공연으로 고급 차량들이 즐비하다.',
+    items: [
+      { id: '21', label: '박 안내 (NPC)',       type: 'testimony', name: '안내원 박씨 증언',         desc: '오늘 개막식이라 정신이 하나도 없었네요. 투자자이신 최민혁 대표님은 8시 정각에 공연이 시작된 이후로는 계속 로비 VIP 라운지에 계셨어요."' },
+      { id: '22', label: '최민혁의 수입 세단',  type: 'clue',      name: '최민혁 차량 내부',         desc: '최민혁 대표의 전용 주차 구역에 세워진 고급 세단이다. 창문 너머로 조수석을 보니, 고급 실크 재질의 검은색 정장 자켓이 툭 던져져 있다.' },
+      { id: '23', label: '주차장 쓰레기통',     type: 'item',      name: '구겨진 물티슈',            desc: '주차장 출입구 옆에 있는 쓰레기통이다. 맨 위에 누군가 쓰고 급하게 뭉쳐서 버린 듯한 일회용 물티슈 몇 장이 던져져 있다.' },
+      { id: '24', label: '주차장 CCTV 카메라', type: 'clue',      name: 'CCTV 입차 기록',           desc: '주차장 입구를 비추는 보안 카메라다. 최민혁 대표의 차량은 개막식 한참 전인 오후 7시 5분에 이미 입차된 것으로 표시되어 있다.' },
+      { id: '25', label: '바닥의 타이어 자국',  type: 'clue',      name: '스키드 마크',              desc: '최민혁 대표의 차량이 주차된 바닥면에 검게 긁힌 스키드 마크가 선명하다. 주차할 때 굉장히 급하게 차를 몰아 멈춰 선 듯한 모양새다' }
+    ]
+  },
+  {
+    id: 'backstage', name: '백스테이지: 배우 분장실 복도',
+    desc: '공연 준비로 분주한 백스테이지. 분장 냄새와 긴장감이 뒤섞여 있다.',
+    items: [
+      { id: '31', label: '김 청소 (NPC)',    type: 'testimony', name: '청소부 김씨 증언',       desc: '나야 뭐 맨날 청소나 하는 사람인디... 오늘 밤에도 대형 쓰레기통 밀고 복도 돌아다니고 있었지유. 내가 8시 30분쯤에 쓰레기통 밀고 박 감독님 방 앞을 지나갔당게요. 근데 안에서 큰 소리가 났어요. 감독님이 분명히 \u201c당장 내 눈앞에서 꺼져! 어디서 대들어?!\u201d 하고 소리쳤고, 뒤이어 쨍그랑하는 소리도 났당게요.' },
+      { id: '32', label: '김서연의 화장대',  type: 'clue',      name: '잠긴 화장대 서랍',      desc: '화려한 전구로 둘러싸인 화장대다. 화장대 아래쪽 서랍은 쇠 자물쇠로 굳게 잠겨 있어 열리지 않는다.' },
+      { id: '33', label: '의상 옷걸이',      type: 'item',      name: '찢긴 드레스 + 서랍 열쇠', desc: '김서연이 오늘 무대에서 입었던 새하얀 실크 드레스가 걸려 있다. 치맛단 한쪽이 거칠게 찢겨 나간 형태다. 드레스 주머니를 뒤적이자 [분장실 서랍 열쇠]가 나온다.' },
+      { id: '34', label: '간이 정수기',      type: 'clue',      name: '버려진 알약 껍질',      desc: '정수기 옆 수거함에 특정 신경안정제 약 조각이 버려져 있다.' },
+      { id: '35', label: '출입문 행거',      type: 'clue',      name: '분필 가루 묻은 바람막이', desc: '현장 스태프들이 움직일 때 입는 검은색 단체 바람막이 점퍼들이 여러 벌 걸려 있다. 몇몇 옷에는 오늘 무대 세트를 옮기다 묻은 듯한 흰색 분필 가루가 묻어있다.' }
+    ]
+  },
+  {
+    id: 'control', name: '보안 구역: 무대 제어실',
+    desc: '무대 전체를 통제하는 심장부. 정진우 감독의 영역이다.',
+    items: [
+      { id: '41', label: '마 경비 (NPC)',      type: 'testimony', name: '경비원 마씨 증언',           desc: '오늘 개막일이라 보안 강도를 높였습니다. CCTV 확인 결과, 외부인 출입은 일절 없었습니다' },
+      { id: '42', label: '철제 사물함',        type: 'clue',      name: '정진우의 잠긴 사물함',      desc: '정진우 감독의 개인 사물함이다. 단단히 잠겨 있다.' },
+      { id: '43', label: '정비용 공구함',      type: 'item',      name: '사물함 작은 열쇠',          desc: '무대 기계를 수리할 때 쓰는 스패너와 드라이버 등이 담긴 철제 공구함이다. 공구들을 들추자 바닥에서 [사물함 작은 열쇠]가 발견된다.' },
+      { id: '44', label: '마스터 콘솔 모니터', type: 'clue',      name: '특허 시스템 강제 변경 기록', desc: '오늘 하루 동안 극장에서 일어난 기계 제어 기록이다. 정진우 감독이 개발한 특허 무대 시스템이 오늘 오후 박 감독의 명의로 강제 변경되어 구동된 기록이 남아있다.' },
+      { id: '45', label: '콘솔 데스크 하단',   type: 'item',      name: 'C타입 초고속 충전기',       desc: '각종 전자기기 선들이 엉켜있는 데스크 아래쪽이다. 박 감독의 전용 태블릿 규격과 딱 맞는 **[C타입 초고속 충전기]**가 콘솔 멀티탭에 꽂혀있다. 빼내어 챙길 수 있다.' }
+    ]
+  },
+  {
+    id: 'restroom', name: '극장 공동 화장실',
+    desc: '극장 내 공용 화장실. 형광등이 깜빡이며 불안한 분위기를 자아낸다.',
+    items: [
+      { id: '51', label: '중앙 세면대',    type: 'clue', name: '배수구 혈흔',       desc: '깨끗하게 청소되어 있는 대리석 세면대다. 배수구 안쪽 깊은 곳에 미처 다 씻겨 내려가지 못하고 고여 있는 아주 옅은 빨간 자국이 남아있다.' },
+      { id: '52', label: '1번 좌변기 칸', type: 'clue', name: '물에 불은 서류 뭉치', desc: '문이 열려 있는 첫 번째 변기 칸이다. 변기 안쪽에 미처 다 갈아 마시지 못하고 버려진 듯한 두꺼운 서류 뭉치가 물에 불어 터진 채 둥둥 떠 있다.' },
+      { id: '53', label: '휴지 수거함',   type: 'clue', name: '혈흔 묻은 물티슈',   desc: '칸막이 옆 쓰레기통이다. 화장실 청소용 일반 물티슈들이 버려져 있는데, 그중 한 장에 누군가 손을 급하게 문질러 닦은 듯한 검붉은 얼룩이 희미하게 번져 있다.' }
+    ]
+  }
+];
+
+const COMBOS = [
+  { ids: ['32','33'], resultId: 'A', type: 'combo', name: '단서 A: 김서연의 비밀 협박 편지',        desc: '박 감독의 노예 계약서 및 약점 협박 내용이 담긴 편지.' },
+  { ids: ['42','43'], resultId: 'B', type: 'combo', name: '단서 B: 박 감독 집무실 비밀번호 포스트잇', desc: '정진우의 사물함에서 발견된 집무실 비밀번호 메모.' },
+  { ids: ['14','45'], resultId: 'C', type: 'combo', name: '단서 C: 복구된 박 감독의 음성 파일',     desc: '"7시 전까지 내 방으로 와서 해명해!" — 박 감독이 누군가를 7시 이전에 불렀다는 호통 녹음 복구.' },
+  { ids: ['31','C'],  resultId: 'D', type: 'combo', name: '단서 D: 8시 30분 목소리의 정체',         desc: '청소부가 들은 호통은 살아있는 박 감독이 아니라, 김서연이 패닉 상태에서 걷어차 켜진 태블릿 재생음이었다.' },
+  { ids: ['41','B'],  resultId: 'E', type: 'combo', name: '단서 E: 정진우의 7시 10분 부재 기록',    desc: '경비원 마씨 추가 증언: "7시 10분쯤 정 감독이 제어실을 비우고 나갔습니다."' },
+  { ids: ['24','21'], resultId: 'F', type: 'combo', name: '단서 F: 사라진 20분의 행적 ★결정적 증거', desc: '최민혁은 7시 5분 입차했으나 로비에 나타난 건 7시 25분.' },
+  { ids: ['25','22'], resultId: 'G', type: 'combo', name: '단서 G: 다급했던 주차 흔적',             desc: '스키드 마크가 최민혁 차량 타이어와 일치.' }
+];
+
+// ══════════════════════════════════════════
+// 게임 상태
+// ══════════════════════════════════════════
+let G = {
+  playerName: '',
+  gender: '',
+  round: 1,
+  maxRound: 15,
+  currentLoc: 'office',
+  investigated: new Set(),
+  inventory: [],
+  selectedCards: [],
+  accuseSuspect: null,
+  accuseEvidence: null
+};
+
+// ══════════════════════════════════════════
+// 유틸
+// ══════════════════════════════════════════
+function showNotif(msg, isError) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = isError ? 'show error' : 'show';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 2800);
+}
+
+function addLog(msg, type) {
+  const box = document.getElementById('logContent');
+  const div = document.createElement('div');
+  div.className = 'le ' + (type || '');
+  const now = new Date();
+  const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  div.innerHTML = '<span class="lt">[' + t + ']</span>' + msg;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function updateRoundDisplay() {
+  const el = document.getElementById('roundNum');
+  el.textContent = G.round;
+  el.className = G.round >= 13 ? 'rnum rwarn' : 'rnum';
+}
+
+// ══════════════════════════════════════════
+// 초기화
+// ══════════════════════════════════════════
+function startGame() {
+  const name = document.getElementById('pname').value.trim();
+  if (!name) { showNotif('이름을 입력해주세요.', true); return; }
+  G.playerName = name;
+  G.gender = document.querySelector('input[name=gender]:checked').value;
+  document.getElementById('startModal').style.display = 'none';
+  showProlog();
+}
+
+function showProlog() {
+  document.getElementById('prologText').innerHTML =
+    '<strong>오늘 밤 서울 한복판의 뮤지컬 극장 <strong>「가온아트홀」</strong>에서 충격적인 사건이 발생했습니다.<br><br>' +
+    '개막 공연이 한창이던 오후 8시 45분, 극단 대표 겸 연출 감독 <strong>박태준(55)</strong>이 자신의 집무실에서 숨진 채 발견되었습니다.<br><br>' +
+    '거짓 뿐인 증언 속 당신에게 주어진 기회는 <strong>오직 15번</strong>. 그 안에 진범을 찾아내야 합니다. (모든 용의자는 거짓말을 할 수도, 진실을 말할 수도 있습니다.)';
+  document.getElementById('prologPage').classList.add('active');
+}
+
+function enterGame() {
+  document.getElementById('prologPage').classList.remove('active');
+  document.getElementById('topBar').classList.add('active');
+  document.getElementById('gameArea').classList.add('active');
+  document.getElementById('playerBadge').innerHTML = G.playerName + ' <span>' + G.gender + ' 탐정</span>';
+  updateRoundDisplay();
+  buildLocationTabs();
+  renderLocation('office');
+  addLog('수사가 시작되었습니다. 각 장소를 조사하고 단서를 수집하세요.', 'system');
+  initInterrogationDesk();
+}
+
+// ══════════════════════════════════════════
+// 장소 탭 + 렌더링
+// ══════════════════════════════════════════
+function buildLocationTabs() {
+  const tabsEl = document.getElementById('locTabs');
+  tabsEl.innerHTML = '';
+  LOCATIONS.forEach(function(loc) {
+    const btn = document.createElement('button');
+    btn.className = 'loc-tab' + (loc.id === G.currentLoc ? ' active' : '');
+    btn.textContent = loc.name.split(':')[0].trim();
+    btn.onclick = function() { renderLocation(loc.id); };
+    tabsEl.appendChild(btn);
+  });
+}
+
+function renderLocation(locId) {
+  G.currentLoc = locId;
+  // 탭 active 갱신
+  document.querySelectorAll('.loc-tab').forEach(function(btn, i) {
+    btn.className = 'loc-tab' + (LOCATIONS[i].id === locId ? ' active' : '');
+  });
+  const loc = LOCATIONS.find(function(l) { return l.id === locId; });
+  const content = document.getElementById('locContent');
+  let html = '<div class="loc-name">' + loc.name + '</div>';
+  html += '<div class="loc-desc">' + loc.desc + '</div>';
+  html += '<div class="inv-grid">';
+  loc.items.forEach(function(item) {
+    const done = G.investigated.has(item.id);
+    html += '<button class="inv-btn"' + (done ? ' disabled' : '') +
+            ' onclick="investigate(\'' + item.id + '\')">' +
+            '<span class="bnum">No.' + item.id + '</span>' +
+            item.label +
+            '</button>';
+  });
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+// 일반 조사
+// ══════════════════════════════════════════
+function investigate(itemId) {
+  if (G.investigated.has(itemId)) return;
+  if (G.round > G.maxRound) { goAccuse(); return; }
+
+  // 아이템 데이터 찾기
+  let found = null;
+  LOCATIONS.forEach(function(loc) {
+    loc.items.forEach(function(it) {
+      if (it.id === itemId) found = it;
+    });
+  });
+  if (!found) return;
+
+  G.investigated.add(itemId);
+  checkQuestionUnlocks();
+  G.inventory.push({ id: itemId, type: found.type, name: found.name, desc: found.desc });
+
+  const typeLabel = { clue: '단서', item: '아이템', testimony: '증언' };
+  addLog('[' + (typeLabel[found.type] || '단서') + ' 획득] ' + found.name + ' — ' + found.desc, found.type);
+
+  spendRound();
+  renderLocation(G.currentLoc);
+  renderInventory();
+}
+
+function spendRound() {
+  G.round++;
+  updateRoundDisplay();
+  if (G.round > G.maxRound) {
+    addLog('기회가 모두 소진되었습니다. 최종 추리 페이지로 이동합니다.', 'system');
+    setTimeout(goAccuse, 1200);
+  }
+}
+</script>
+<script>
+// ══════════════════════════════════════════
+// STEP 4: 인벤토리 렌더링 + 카드 선택 + 조합
+// ══════════════════════════════════════════
+
+function renderInventory() {
+  const list = document.getElementById('cardList');
+  const cnt = document.getElementById('invCount');
+  cnt.textContent = G.inventory.length;
+  if (G.inventory.length === 0) {
+    list.innerHTML = '<div class="empty-inv">아직 수집된 단서가 없습니다.<br>현장을 조사하세요.</div>';
+    return;
+  }
+  list.innerHTML = G.inventory.map(card => {
+    const sel = G.selectedCards.includes(card.id) ? 'selected' : '';
+    const badge = G.selectedCards.includes(card.id) ? '<span class="csbadge">선택됨</span>' : '';
+    return `<div class="card ${sel}" onclick="toggleCard('${card.id}')">
+      <div class="ctype ${card.type}">${typeLabel(card.type)}</div>
+      <div class="cname">${card.name}</div>
+      <div class="cdesc">${card.desc}</div>
+      ${badge}
+    </div>`;
+  }).join('');
+  updateComboUI();
+}
+
+function typeLabel(t) {
+  if (t === 'clue') return '🔍 단서';
+  if (t === 'item') return '📦 아이템';
+  if (t === 'testimony') return '💬 증언';
+  if (t === 'combo') return '⭐ 조합 단서';
+  return t;
+}
+
+function toggleCard(id) {
+  const idx = G.selectedCards.indexOf(id);
+  if (idx > -1) {
+    G.selectedCards.splice(idx, 1);
+  } else {
+    if (G.selectedCards.length >= 2) {
+      showNotif('카드는 최대 2장만 선택할 수 있습니다.', true);
+      return;
+    }
+    G.selectedCards.push(id);
+  }
+  renderInventory();
+}
+
+function updateComboUI() {
+  const btn = document.getElementById('btnCombine');
+  const hint = document.getElementById('comboHint');
+  if (G.selectedCards.length === 2) {
+    btn.disabled = false;
+    hint.textContent = `선택: ${G.selectedCards.map(id => {
+      const c = G.inventory.find(x => String(x.id) === String(id));
+      return c ? c.name : id;
+    }).join(' + ')}`;
+  } else {
+    btn.disabled = true;
+    hint.textContent = `카드 2장을 선택하면 조합을 시도할 수 있습니다. (${G.selectedCards.length}/2)`;
+  }
+}
+
+function tryCombine() {
+  if (G.selectedCards.length !== 2) return;
+  const [a, b] = G.selectedCards;
+  const match = COMBOS.find(c => {
+    const s1 = String(c.ids[0]);
+    const s2 = String(c.ids[1]);
+    return (s1 === String(a) && s2 === String(b)) || (s1 === String(b) && s2 === String(a));
+  });
+  if (match) {
+    const already = G.inventory.find(x => x.id === match.resultId);
+    if (already) {
+      showNotif('이미 조합된 단서입니다.', true);
+      G.selectedCards = [];
+      renderInventory();
+      return;
+    }
+    G.inventory.push({ id: match.resultId, type: match.type, name: match.name, desc: match.desc });
+    G.selectedCards = [];
+    addLog(`[조합 성공] ${match.name} 획득!`, 'combo');
+    showNotif(`✨ ${match.name} 획득!`);
+    spendRound();
+    renderInventory();
+  } else {
+    addLog('아무런 연관성이 없는 것 같다.', 'fail');
+    showNotif('아무런 연관성이 없는 것 같다.', true);
+    G.selectedCards = [];
+    renderInventory();
+  }
+}
+
+// ══════════════════════════════════════════
+// 최종 추리 페이지
+// ══════════════════════════════════════════
+
+function goAccuse() {
+  document.getElementById('topBar').classList.remove('active');
+  document.getElementById('gameArea').classList.remove('active');
+  document.getElementById('accusePage').classList.add('active');
+  renderEvidenceList();
+}
+
+function renderEvidenceList() {
+  const el = document.getElementById('evidenceList');
+  if (G.inventory.length === 0) {
+    el.innerHTML = '<div class="no-ev">수집된 단서가 없습니다.</div>';
+    return;
+  }
+  el.innerHTML = G.inventory.map(card => {
+    const sel = G.accuseEvidence === card.id ? 'selected' : '';
+    return `<div class="eitem ${sel}" onclick="selectEvidence('${card.id}')">
+      <div class="et">${typeLabel(card.type)}</div>
+      <div>${card.name}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectSuspect(name) {
+  G.accuseSuspect = name;
+  document.querySelectorAll('.scard').forEach(el => el.classList.remove('selected'));
+  const map = { '최민혁': 'sc_choi', '김서연': 'sc_kim', '정진우': 'sc_jung' };
+  document.getElementById(map[name]).classList.add('selected');
+  checkVerdictReady();
+}
+
+function selectEvidence(id) {
+  G.accuseEvidence = id;
+  document.querySelectorAll('.eitem').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  checkVerdictReady();
+}
+
+function checkVerdictReady() {
+  const btn = document.getElementById('btnVerdict');
+  btn.disabled = !(G.accuseSuspect && G.accuseEvidence);
+}
+
+function submitVerdict() {
+  const correctSuspect = '최민혁';
+  const correctEvidence = 'F';
+  const isTrue = G.accuseSuspect === correctSuspect && G.accuseEvidence === correctEvidence;
+  showEnding(isTrue);
+}
+
+// ══════════════════════════════════════════
+// 엔딩
+// ══════════════════════════════════════════
+
+function showEnding(isTrue) {
+  document.getElementById('accusePage').classList.remove('active');
+  const ep = document.getElementById('endingPage');
+  ep.classList.add('active');
+
+  if (isTrue) {
+    ep.className = 'ending-true';
+    ep.classList.add('active');
+    document.getElementById('endIcon').textContent = '⚖️';
+    document.getElementById('endTitle').textContent = 'TRUE ENDING';
+    document.getElementById('endText').textContent =
+      `${G.playerName} 탐정은 단서 F를 최민혁의 눈앞에 들이밀었다.`;
+    document.getElementById('endDetail').innerHTML = `
+      <strong style="color:#d4a017">[ 사건의 진실 ]</strong><br><br>
+      나, 최민혁은 철저한 계산과 냉정함으로 지금의 자리에 올랐다. 비즈니스에서 감정은 사치일 뿐이다. 하지만 오늘 밤, 그 비열한 늙은이는 내 목줄을 쥐고 흔들었다.<br><br>
+      내일 아침이면 MH 캐피탈 본사의 대대적인 특별 감사가 시작된다. 박태준 그 쓰레기가 투자금 50억 원을 도박으로 탕진한 것이 걸리는 건 상관없다. 진짜 문제는 놈의 요구로 투자금을 부풀려 승인해 주고, 함께 비자금을 세탁했던 내 흔적들이 발각되는 것이었다.<br><br>
+      개막식 시작 직전인 오후 7시 10분, 나는 놈의 집무실 문을 걸어 잠그고 마지막 경고를 했다. 해외로 밀항하든가, 아니면 혼자 죄를 뒤집어쓰고 자수하라고.<br><br>
+      하지만 놈은 내 지시가 담긴 이중 계약서와 녹음기를 내 눈앞에서 흔들며 비열하게 쪼개기 시작했다."내가 왜 독박을 써? 내일 감사팀 오면 이거 다 넘길 거야. 얌전히 나 대신 감옥에 가든가, 아니면 오늘 밤 무대를 무너뜨려서 100억짜리 보험금 나오면 반씩 나눠 갖고 퉁치든가 선택해. 넌 내 노예야, 최 대표."<br><br>
+      그 끔찍한 웃음소리를 듣는 순간, 내 머릿속의 정교한 회로가 차갑게 굳어졌다. 이 인간은 살려두면 평생 내 피를 빨아먹을 기생충이다. 하지만 지금 놈이 죽는다면? 모든 죄는 '투자금을 탕진하고 압박을 이기지 못해 자살한 박태준'의 단독 범행이 된다. 나는 완벽한 피해자가 되는 것이다.<br><br>
+      나는 망설임 없이 책상 위에 있던 묵직한 황동 트로피를 손에 쥐고, 놈의 머리를 향해 사정없이 내리쳤다. 오후 7시 15분. 비명 지를 시간조차 주지 않은, 완벽한 즉사였다.<br><br>
+      순간 심장이 미친 듯이 뛰었지만, 나는 곧바로 차가운 평정심을 되찾았다. 놈의 손에서 내 약점이 담긴 이중 계약서와 녹음기를 빼앗아 불로 태워버렸다. 이제 흔적은 없다. 남은 것은 놈을 사채 빚과 감사 압박에 시달려 떠난 '충동적 자살자'로 만드는 것뿐이었다.<br><br>
+      나는 아직 온기가 남은 박태준의 시체를 끌고 가 집무실 벽면에 머리를 몇 차례 거칠게 짓이겨 박아버렸다. 놈이 극심한 스트레스로 제정신이 아닌 상태에서 자해를 하다가 목을 맨 것처럼 꾸미기 위함이었다. 벽에 피가 뭉개져 묻어나는 것을 확인한 뒤, 미리 준비해 둔 밧줄로 놈의 목을 매달아 허공에 띄웠다.<br><br>
+      마지막으로 발밑에 쓰러진 의자를 교묘하게 배치해 '발악의 흔적'을 완성했다. 그리고 범행에 사용한 트로피에 묻은 피를 내가 입고 있는 검은색 실크 셔츠의 뒷소매와 가슴팍에 문질러 닦아냈다.<br><br>
+      완벽했다. 셔츠는 빛을 흡수하는 차분한 검은색인 데다 실크 특유의 은은한 광택 때문에 피가 스며들어도 육안으로는 절대 보이지 않았다. 놈의 지문까지 깨끗이 지운 뒤, 트로피를 제자리에 돌려놓고 아무 일도 없다는 듯 시계를 보며 집무실을 빠져나왔다.<br><br>
+      오후 8시 00분. 나는 사람들이 북적이는 가온아트홀 로비 라운지에 모습을 드러냈다. 일부러 안내원에게 말을 걸어 에스프레소를 주문했고, 다른 대기업 VIP 투자자들 사이에 섞여 여유롭게 와인을 마셨다. 8시 이후, 극장 안의 수많은 눈동자가 나의 완벽한 알리바이를 증명하는 증인이 되었다.<br><br>
+      그런데 내 계산조차 뛰어넘은 기적 같은 일이 일어났다.<br><br>
+      나중에 알게 된 사실이지만, 8시 30분에 주연 여배우 김서연 그 멍청한 년이 서류를 훔치려 집무실에 잠입했던 것이다. 놈의 시체를 보고 멘탈이 터진 그 년이 서류를 뒤지다가 실수로 책상 위 태블릿의 '조연출 폭언 녹음 파일'을 재생하고 던져서 깨뜨렸단다.<br><br>
+      방 안 가득 울려 퍼진 박태준의 호통 소리와 물건 깨지는 소리. 복도를 지나던 청소부는 그걸 박태준이 살아있는 소리로 철석같이 믿어버렸다.<br><br>
+      내가 판을 짜지도 않았는데, 탐욕에 눈먼 다른 용의자가 내 살인 현장에 들어와서 나를 위한 완벽한 '사망 시간 조작 알리바이'를 알아서 완성해 준 것이다.<br><br>
+      박태준은 9시 이전에 죽은 채 발견되었고, 세상 모두가 8시 30분까지 놈이 살아있었다고 믿고 있다. 그리고 그 시간에 나는 수많은 사람들과 함께 로비에 있었다.<br><br>
+      이제 이 멍청한 가온아트홀에서 나를 의심할 수 있는 인간은 아무도 없다.<br><br>
+      최민혁은 완벽한 범죄를 꿈꿨다.<br><br>
+      하지만 CCTV는 거짓말을 하지 않았다. <strong style="color:#f0c040">7시 5분 입차, 7시 25분 로비 등장 — 사라진 20분.</strong><br><br>
+      단서를 들이밀자 최민혁의 얼굴이 굳었다. 잠시 침묵이 흘렀고, 그는 천천히 고개를 숙였다.<br><br>
+      <em>"...내가 했소."</em><br><br>
+      경찰이 최민혁에게 수갑을 채웠다. 막이 내렸다.
+    `;
+  } else {
+    ep.className = 'ending-bad';
+    ep.classList.add('active');
+    document.getElementById('endIcon').textContent = '🎭';
+    document.getElementById('endTitle').textContent = 'BAD ENDING';
+    const suspectCard = G.inventory.find(x => x.id === G.accuseEvidence);
+    const evidenceName = suspectCard ? suspectCard.name : '불충분한 증거';
+    document.getElementById('endText').textContent =
+      `${G.playerName} 당신은 ${G.accuseSuspect}을(를) 지목하며 "${evidenceName}"을 제시했다.`;
+    document.getElementById('endDetail').innerHTML = `
+      <strong style="color:#e74c3c">[ 수사 실패 ]</strong><br><br>
+      ${G.accuseSuspect}의 변호인은 즉각 반박했다. 제시된 증거만으로는 범행을 입증하기에 턱없이 부족했다.<br><br>
+      법정은 무죄를 선고했다.<br><br>
+      그 순간, 방청석 한쪽에서 진범이 조용히 미소를 지으며 자리에서 일어났다. 그는 유유히 법정을 빠져나갔다.<br><br>
+      <strong style="color:#e74c3c">사건은 미궁에 빠졌다.</strong> 박태준 감독의 죽음은 영원히 자살로 기록될 것이다.<br><br>
+      <em>결정적 단서를 놓쳤다. 다시 처음부터 수사해보겠는가?</em>
+    `;
+  }
+}
+
+// ══════════════════════════════════════════
+// 유틸
+// ══════════════════════════════════════════
+
+function showNotif(msg, isError) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = isError ? 'error show' : 'show';
+  clearTimeout(window._notifTimer);
+  window._notifTimer = setTimeout(() => { el.className = isError ? 'error' : ''; }, 2800);
+}
+
+function addLog(msg, type) {
+  const lc = document.getElementById('logContent');
+  const now = new Date();
+  const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const div = document.createElement('div');
+  div.className = `le ${type || ''}`;
+  div.innerHTML = `<span class="lt">${time}</span>${msg}`;
+  lc.appendChild(div);
+  lc.scrollTop = lc.scrollHeight;
+}
+
+// ══════════════════════════════════════════
+// 심문 데스크 시스템 (조사 기회 차감 없음)
+// ══════════════════════════════════════════
+
+// 질문 데이터
+// unlockNeeds: 해금에 필요한 아이템 ID 배열 (AND 조건 — 전부 있어야 해금)
+const QUESTIONS = [
+  {
+    id: 'Q_MH_01',
+    suspect: 'choi',
+    suspectName: '최민혁',
+    text: '"7시 5분 입차 후 7시 25분까지 어디 계셨습니까?"',
+    testimony: '차... 차량 기록이 그렇게 되어 있습니까? 아, 차 안에서 중요한 해외 투자 통화를 하느라 내리지 못했던 것뿐입니다. 범죄와는 아무 상관 없습니다.',
+    isLocked: true,
+    unlockNeeds: ['24']
+  },
+  {
+    id: 'Q_KSY_01',
+    suspect: 'kim',
+    suspectName: '김서연',
+    text: '"신경안정제를 복용하고 있었습니까? 오늘 밤 상태가 어땠나요?"',
+    testimony: '...네, 제 거 맞아요. 오늘 무대 올라가기 전에 너무 불안해서 먹었어요. 하지만 그게 왜요? 무대 공포증이 있는 배우가 약 좀 먹은 게 죄인가요?',
+    isLocked: true,
+    unlockNeeds: ['34']
+  },
+  {
+    id: 'Q_KSY_02',
+    suspect: 'kim',
+    suspectName: '김서연',
+    text: '"화장대 서랍과 변기에서 발견된 서류들에 대해 설명해주시겠습니까?"',
+    testimony: '그 서류들... 박 감독이 제 약점을 잡고 협박해서 강제로 맺게 한 노예계약서예요! 8시 30분에 감독 방에 그걸 훔치러 갔다가 시체를 보고 눈이 뒤집혀서, 서류만 들고 도망쳐 나와 화장실 변기에 버린 거예요! 하지만 난 절대 안 죽였어요!',
+    isLocked: true,
+    unlockNeeds: ['32', '52']
+  },
+  {
+    id: 'Q_JW_01',
+    suspect: 'jung',
+    suspectName: '정진우',
+    text: '"사물함에서 발견된 집무실 비밀번호 메모, 어떻게 알고 있었습니까?"',
+    testimony: '내 사물함까지 열어보셨군... 맞아요. 7시 10분에 박 감독 방 문 앞까지 갔는데, 안에서 박 감독이랑 어떤 사람이 진짜 무섭게 지르는 싸움 소리가 났어요. 안내 방송 때문에 목소리 구별은 못 했지만, 괜히 엮이기 싫어서 7시 13분에 바로 제어실로 도망쳐 돌아왔습니다.',
+    isLocked: true,
+    unlockNeeds: ['42']
+  }
+];
+
+// 현재 선택된 심문 용의자 탭
+let currentDeskSuspect = 'choi';
+
+// 해금 조건 체크 — 획득한 아이템 기준으로 질문 isLocked 갱신
+function checkQuestionUnlocks() {
+  const acquiredIds = new Set(G.inventory.map(c => String(c.id)));
+  let anyChanged = false;
+  QUESTIONS.forEach(q => {
+    if (!q.isLocked) return;
+    const allMet = q.unlockNeeds.every(need => acquiredIds.has(String(need)));
+    if (allMet) {
+      q.isLocked = false;
+      anyChanged = true;
+    }
+  });
+  if (anyChanged) renderDeskQuestions();
+}
+
+// 심문 데스크 탭 초기화
+function buildDeskTabs() {
+  const suspects = [
+    { id: 'choi', label: '💼 최민혁' },
+    { id: 'kim',  label: '🎭 김서연' },
+    { id: 'jung', label: '🎬 정진우' }
+  ];
+  const tabs = document.getElementById('deskTabs');
+  tabs.innerHTML = '';
+  suspects.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'desk-tab' + (s.id === currentDeskSuspect ? ' active' : '');
+    btn.textContent = s.label;
+    btn.onclick = () => {
+      currentDeskSuspect = s.id;
+      document.querySelectorAll('.desk-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderDeskQuestions();
+    };
+    tabs.appendChild(btn);
+  });
+}
+
+// 현재 탭의 질문 목록 렌더링
+function renderDeskQuestions() {
+  const container = document.getElementById('deskQuestions');
+  const filtered = QUESTIONS.filter(q => q.suspect === currentDeskSuspect);
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="desk-empty">이 용의자에 대한 질문이 없습니다.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  filtered.forEach(q => {
+    const btn = document.createElement('button');
+    btn.className = 'q-btn' + (q.isLocked ? ' locked' : '');
+    btn.innerHTML = `
+      <span class="q-icon">${q.isLocked ? '🔒' : '💬'}</span>
+      <span class="q-text">${q.text}</span>
+      <span class="q-badge">${q.isLocked ? '잠김' : '질문 가능'}</span>
+    `;
+    if (!q.isLocked) {
+      btn.onclick = () => askQuestion(q);
+    }
+    container.appendChild(btn);
+  });
+}
+
+// 질문 클릭 핸들러 — 조사 기회 차감 없이 로그만 출력
+function askQuestion(q) {
+  addLog(`[심문] ${q.suspectName} — ${q.text}`, 'testimony');
+  addLog(`↳ ${q.testimony}`, 'testimony');
+  showNotif(`${q.suspectName}의 증언을 확보했습니다.`);
+}
+
+// 심문 데스크 초기화 (enterGame에서 호출)
+function initInterrogationDesk() {
+  document.getElementById('interrogationDesk').style.display = 'block';
+  buildDeskTabs();
+  renderDeskQuestions();
+}
+
+</script>
+</body>
+</html>
+
+
+
+
+
