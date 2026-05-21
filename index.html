@@ -527,10 +527,35 @@ function startGame() {
 }
 
 function showProlog() {
-  document.getElementById('prologText').innerHTML =
-    '<strong>오늘 밤 서울 한복판의 뮤지컬 극장 <strong>「가온아트홀」</strong>에서 충격적인 사건이 발생했습니다.<br><br>' +
-    '개막 공연이 한창이던 오후 8시 45분, 극단 대표 겸 연출 감독 <strong>박태준(55)</strong>이 자신의 집무실에서 숨진 채 발견되었습니다.<br><br>' +
-    '거짓 뿐인 증언 속 당신에게 주어진 기회는 <strong>오직 20번</strong>. 그 안에 진범을 찾아내야 합니다. (모든 용의자는 거짓말을 할 수도, 진실을 말할 수도 있습니다.)';
+  document.getElementById('prologText').innerHTML = `
+    대한민국 창작 뮤지컬의 심장이라 불리는 <가온아트홀>의 개막일 밤. 
+    100억 원의 제작비가 투입된 대작 <낙화>의 1막이 무대 위에서 화려하게 펼쳐지고 있던 오후 8시 30분, 
+    비극은 무대 뒤편에서 조용히 시작되고 있었다.<br><br>
+    
+    가온아트홀 미화원인 김 아주머니는 대형 쓰레기통을 밀며 극단 대표이자 총감독인 박태준의 집무실 앞 복도를 지나고 있었다. 
+    평소 안하무인에 갑질로 악명이 높던 박 감독이었기에, 아주머니는 오늘도 무사히 넘어가길 바라며 발걸음을 재촉했다.<br><br>
+    
+    그 순간, 굳게 닫힌 집무실 문틈 사이로 박태준 감독 특유의 웅장하고 거친 호통 소리가 뿜어져 나왔다.<br><br>
+    
+    "당장 내 눈앞에서 꺼져! 쥐새끼 같은 새끼가 어디서 대들어?!"<br><br>
+    
+    뒤이어 무언가 쨍그랑하며 바닥에 세차게 부서지는 둔탁한 파편 소리가 복도까지 선명하게 울렸다. 
+    김 아주머니는 '어휴, 감독님이 또 누구를 잡고 있나 보네' 하며 몸을 움츠린 채 서둘러 자리를 피했다. 
+    그것이 오늘 밤, 박태준 감독의 방에서 흘러나온 마지막 소리였다.<br><br>
+    
+    오후 9시 정각, 1막이 끝나고 인터미션이 시작되자 수석 조연출인 당신은 다음 막의 큐사인을 확인하기 위해 감독 집무실의 문을 두드렸다. 
+    하지만 안에서는 아무런 대답이 없었다. 이상한 예감에 마스터키로 문을 열고 들어선 당신의 눈앞에 기괴한 광경이 펼쳐졌다.<br><br>
+    
+    어두컴컴한 방 한가운데, 박태준 감독이 목을 맨 채 허공에 매달려 있었다. 
+    책상 위에는 거액의 사채 빚 독촉 서류가 어지럽게 널려 있었고, 바닥에는 깨진 재떨이 파편들이 뒹굴고 있었다. 
+    현장의 정황으로 보아 박태준 감독은 오늘 밤 9시 이전에 사망한 것으로 추정된다.<br><br>
+    
+    경찰이 들이닥치고 극장은 순식간에 아수라장이 된 가운데, 당신은 현장을 보존하며 본격적인 수색을 시작한다.<br><br>
+    
+    거짓 뿐인 증언 속 당신에게 주어진 기회는 <strong>오직 20번</strong>. 
+    이 기묘한 사건의 비밀을 밝혀내기 위한 피 말리는 추리 게임이 이제 시작된다.
+  `;
+  
   document.getElementById('prologPage').classList.add('active');
 }
 
@@ -538,7 +563,7 @@ function enterGame() {
   document.getElementById('prologPage').classList.remove('active');
   document.getElementById('topBar').classList.add('active');
   document.getElementById('gameArea').classList.add('active');
-  document.getElementById('playerBadge').innerHTML = G.playerName + ' <span>' + G.gender + ' 탐정</span>';
+  document.getElementById('playerBadge').innerHTML = G.playerName + ' <span>' + G.gender + ' 조연출</span>';
   updateRoundDisplay();
   buildLocationTabs();
   renderLocation('office');
@@ -797,7 +822,7 @@ function showEnding(result) {
     document.getElementById('endIcon').textContent = '⚖️';
     document.getElementById('endTitle').textContent = 'TRUE ENDING';
     document.getElementById('endText').textContent =
-      `${G.playerName} 탐정은 단서 F를 최민혁의 눈앞에 들이밀었다.`;
+      `${G.playerName} 당신은 단서 F를 최민혁의 눈앞에 들이밀었다.`;
     document.getElementById('endDetail').innerHTML = `
       <strong style="color:#d4a017">[ 사건의 진실 ]</strong><br><br>
       나, 최민혁은 철저한 계산과 냉정함으로 지금의 자리에 올랐다. 비즈니스에서 감정은 사치일 뿐이다. 하지만 오늘 밤, 그 비열한 늙은이는 내 목줄을 쥐고 흔들었다.<br><br>
@@ -834,14 +859,14 @@ function showEnding(result) {
     if (result === 'suspect_only') {
       // 범인은 맞췄지만 증거가 틀린 경우
       document.getElementById('endText').textContent =
-        `${G.playerName} 탐정은 최민혁을 지목했지만, 결정적 증거를 제시하지 못했다.`;
+        `${G.playerName} 당신은 최민혁을 지목했지만, 결정적 증거를 제시하지 못했다.`;
       document.getElementById('endDetail').innerHTML = `
         <strong style="color:#e74c3c">[ 증거 불충분 ]</strong><br><br>
         범인은 맞았다. 최민혁이 박태준을 살해한 것은 사실이었다.<br><br>
         하지만 "${evidenceName}"만으로는 법정에서 그를 유죄로 만들기에 부족했다.<br><br>
         최민혁의 변호인은 즉각 반박했다. "정황 증거만으로 제 의뢰인을 살인범으로 몰 수는 없습니다."<br><br>
         법정은 증거 불충분으로 무죄를 선고했다.<br><br>
-        최민혁은 법정을 나서며 탐정을 향해 차갑게 미소 지었다. 그는 알고 있었다 — 당신이 진실에 가장 가까이 다가갔다는 것을.<br><br>
+        최민혁은 법정을 나서며 당신을 향해 차갑게 미소 지었다. 그는 알고 있었다 — 당신이 진실에 가장 가까이 다가갔다는 것을.<br><br>
         <strong style="color:#e74c3c">결정적 단서는 따로 있었다.</strong><br><br>
         <em>진범을 알면서도 놓쳐버렸다. 다시 한번 도전해보겠는가?</em>
       `;
