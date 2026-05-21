@@ -307,7 +307,7 @@ body{background:var(--bg);color:var(--tp);font-family:Georgia,Batang,serif;min-h
 <div id="topBar">
   <div class="top-left">
     <div class="pbadge" id="playerBadge"></div>
-    <div class="rdisplay">라운드 <span class="rnum" id="roundNum">1</span> / 15</div>
+    <div class="rdisplay">라운드 <span class="rnum" id="roundNum">1</span> / 20</div>
   </div>
   <div class="gtitle">막이 내리기 전에</div>
   <button class="btn-accuse" onclick="goAccuse()">⚖ 최종 범인 지목</button>
@@ -477,7 +477,7 @@ let G = {
   playerName: '',
   gender: '',
   round: 1,
-  maxRound: 15,
+  maxRound: 20,
   currentLoc: 'office',
   investigated: new Set(),
   inventory: [],
@@ -511,7 +511,7 @@ function addLog(msg, type) {
 function updateRoundDisplay() {
   const el = document.getElementById('roundNum');
   el.textContent = G.round;
-  el.className = G.round >= 13 ? 'rnum rwarn' : 'rnum';
+  el.className = G.round >= 18 ? 'rnum rwarn' : 'rnum';
 }
 
 // ══════════════════════════════════════════
@@ -530,7 +530,7 @@ function showProlog() {
   document.getElementById('prologText').innerHTML =
     '<strong>오늘 밤 서울 한복판의 뮤지컬 극장 <strong>「가온아트홀」</strong>에서 충격적인 사건이 발생했습니다.<br><br>' +
     '개막 공연이 한창이던 오후 8시 45분, 극단 대표 겸 연출 감독 <strong>박태준(55)</strong>이 자신의 집무실에서 숨진 채 발견되었습니다.<br><br>' +
-    '거짓 뿐인 증언 속 당신에게 주어진 기회는 <strong>오직 15번</strong>. 그 안에 진범을 찾아내야 합니다. (모든 용의자는 거짓말을 할 수도, 진실을 말할 수도 있습니다.)';
+    '거짓 뿐인 증언 속 당신에게 주어진 기회는 <strong>오직 20번</strong>. 그 안에 진범을 찾아내야 합니다. (모든 용의자는 거짓말을 할 수도, 진실을 말할 수도 있습니다.)';
   document.getElementById('prologPage').classList.add('active');
 }
 
