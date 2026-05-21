@@ -960,15 +960,23 @@ let currentDeskSuspect = 'choi';
 // 해금 조건 체크 — 획득한 아이템 기준으로 질문 isLocked 갱신
 function checkQuestionUnlocks() {
   const acquiredIds = new Set(G.inventory.map(c => String(c.id)));
+  let hasNewUnlock = false;
+
   QUESTIONS.forEach(q => {
     if (!q.isLocked) return;
+
     const allMet = q.unlockNeeds.every(need => acquiredIds.has(String(need)));
     if (allMet) {
       q.isLocked = false;
       showNotif(`🔓 새 질문 해금: ${q.suspectName}에게 질문할 수 있습니다!`);
+      hasNewUnlock = true;
     }
   });
-  renderDeskQuestions();
+
+  // 새롭게 해금된 것이 있을 때만 렌더링 갱신
+  if (hasNewUnlock) {
+    renderDeskQuestions();
+  }
 }
 
 // 심문 데스크 탭 초기화
