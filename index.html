@@ -384,6 +384,7 @@ body{background:var(--bg);color:var(--tp);font-family:Georgia,Batang,serif;min-h
     <div class="elist" id="evidenceList"></div>
   </div>
   <button class="btn-verdict" id="btnVerdict" disabled onclick="submitVerdict()">범인 지목하기</button>
+  <button class="btn-back-accuse" onclick="backToGame()" style="margin-top:12px;width:100%;padding:12px;background:transparent;border:1px solid var(--bdr);border-radius:2px;color:var(--ts);font-family:inherit;font-size:.85rem;letter-spacing:.15em;cursor:pointer;transition:all .2s;text-transform:uppercase;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--goldb)'" onmouseout="this.style.borderColor='var(--bdr)';this.style.color='var(--ts)'">← 수사 화면으로 돌아가기</button>
 </div>
 
 <!-- ══ ENDING PAGE ══ -->
@@ -464,7 +465,7 @@ const COMBOS = [
   { ids: ['14','45'], resultId: 'C', type: 'combo', name: '단서 C: 복구된 박 감독의 음성 파일',     desc: '"7시 전까지 내 방으로 와서 해명해!" — 박 감독이 누군가를 7시 이전에 불렀다는 호통 녹음 복구.' },
   { ids: ['31','C'],  resultId: 'D', type: 'combo', name: '단서 D: 8시 30분 목소리의 정체',         desc: '청소부가 들은 호통은 살아있는 박 감독이 아니라, 김서연이 패닉 상태에서 걷어차 켜진 태블릿 재생음이었다.' },
   { ids: ['41','B'],  resultId: 'E', type: 'combo', name: '단서 E: 정진우의 7시 10분 부재 기록',    desc: '경비원 마씨 추가 증언: "7시 10분쯤 정 감독이 제어실을 비우고 나갔습니다."' },
-  { ids: ['24','21'], resultId: 'F', type: 'combo', name: '단서 F: 사라진 20분의 행적 ★결정적 증거', desc: '최민혁은 7시 5분 입차했으나 로비에 나타난 건 7시 25분.' },
+  { ids: ['24','21'], resultId: 'F', type: 'combo', name: '단서 F: 사라진 20분의 행적', desc: '최민혁은 7시 5분 입차했으나 로비에 나타난 건 7시 25분.' },
   { ids: ['25','22'], resultId: 'G', type: 'combo', name: '단서 G: 다급했던 주차 흔적',             desc: '스키드 마크가 최민혁 차량 타이어와 일치.' },
   { ids: ['15','11'], resultId: 'H', type: 'combo', name: '단서 H: 트로피 타격 흔적',               desc: '황동 트로피로 시체의 머리를 가격한 것으로 보여진다. 트로피에는 무언가 닦다 만 흔적이 보인다.' }
 ];
@@ -703,6 +704,7 @@ function tryCombine() {
     G.selectedCards = [];
     addLog(`[조합 성공] ${match.name} 획득!`, 'combo');
     showNotif(`✨ ${match.name} 획득!`);
+    checkQuestionUnlocks();
     spendRound();
     renderInventory();
   } else {
@@ -759,23 +761,37 @@ function checkVerdictReady() {
   btn.disabled = !(G.accuseSuspect && G.accuseEvidence);
 }
 
+function backToGame() {
+  document.getElementById('accusePage').classList.remove('active');
+  document.getElementById('topBar').classList.add('active');
+  document.getElementById('gameArea').classList.add('active');
+}
+
 function submitVerdict() {
   const correctSuspect = '최민혁';
   const correctEvidence = 'F';
-  const isTrue = G.accuseSuspect === correctSuspect && G.accuseEvidence === correctEvidence;
-  showEnding(isTrue);
+  const suspectCorrect = G.accuseSuspect === correctSuspect;
+  const evidenceCorrect = G.accuseEvidence === correctEvidence;
+
+  if (suspectCorrect && evidenceCorrect) {
+    showEnding('true');
+  } else if (suspectCorrect && !evidenceCorrect) {
+    showEnding('suspect_only');
+  } else {
+    showEnding('bad');
+  }
 }
 
 // ══════════════════════════════════════════
 // 엔딩
 // ══════════════════════════════════════════
 
-function showEnding(isTrue) {
+function showEnding(result) {
   document.getElementById('accusePage').classList.remove('active');
   const ep = document.getElementById('endingPage');
   ep.classList.add('active');
 
-  if (isTrue) {
+  if (result === 'true') {
     ep.className = 'ending-true';
     ep.classList.add('active');
     document.getElementById('endIcon').textContent = '⚖️';
@@ -814,16 +830,34 @@ function showEnding(isTrue) {
     document.getElementById('endTitle').textContent = 'BAD ENDING';
     const suspectCard = G.inventory.find(x => x.id === G.accuseEvidence);
     const evidenceName = suspectCard ? suspectCard.name : '불충분한 증거';
-    document.getElementById('endText').textContent =
-      `${G.playerName} 당신은 ${G.accuseSuspect}을(를) 지목하며 "${evidenceName}"을 제시했다.`;
-    document.getElementById('endDetail').innerHTML = `
-      <strong style="color:#e74c3c">[ 수사 실패 ]</strong><br><br>
-      ${G.accuseSuspect}의 변호인은 즉각 반박했다. 제시된 증거만으로는 범행을 입증하기에 턱없이 부족했다.<br><br>
-      법정은 무죄를 선고했다.<br><br>
-      그 순간, 방청석 한쪽에서 진범이 조용히 미소를 지으며 자리에서 일어났다. 그는 유유히 법정을 빠져나갔다.<br><br>
-      <strong style="color:#e74c3c">사건은 미궁에 빠졌다.</strong> 박태준 감독의 죽음은 영원히 자살로 기록될 것이다.<br><br>
-      <em>결정적 단서를 놓쳤다. 다시 처음부터 수사해보겠는가?</em>
-    `;
+
+    if (result === 'suspect_only') {
+      // 범인은 맞췄지만 증거가 틀린 경우
+      document.getElementById('endText').textContent =
+        `${G.playerName} 탐정은 최민혁을 지목했지만, 결정적 증거를 제시하지 못했다.`;
+      document.getElementById('endDetail').innerHTML = `
+        <strong style="color:#e74c3c">[ 증거 불충분 ]</strong><br><br>
+        범인은 맞았다. 최민혁이 박태준을 살해한 것은 사실이었다.<br><br>
+        하지만 "${evidenceName}"만으로는 법정에서 그를 유죄로 만들기에 부족했다.<br><br>
+        최민혁의 변호인은 즉각 반박했다. "정황 증거만으로 제 의뢰인을 살인범으로 몰 수는 없습니다."<br><br>
+        법정은 증거 불충분으로 무죄를 선고했다.<br><br>
+        최민혁은 법정을 나서며 탐정을 향해 차갑게 미소 지었다. 그는 알고 있었다 — 당신이 진실에 가장 가까이 다가갔다는 것을.<br><br>
+        <strong style="color:#e74c3c">결정적 단서는 따로 있었다.</strong><br><br>
+        <em>진범을 알면서도 놓쳐버렸다. 다시 한번 도전해보겠는가?</em>
+      `;
+    } else {
+      // 범인도 틀린 경우
+      document.getElementById('endText').textContent =
+        `${G.playerName} 당신은 ${G.accuseSuspect}을(를) 지목하며 "${evidenceName}"을 제시했다.`;
+      document.getElementById('endDetail').innerHTML = `
+        <strong style="color:#e74c3c">[ 수사 실패 ]</strong><br><br>
+        ${G.accuseSuspect}의 변호인은 즉각 반박했다. 제시된 증거만으로는 범행을 입증하기에 턱없이 부족했다.<br><br>
+        법정은 무죄를 선고했다.<br><br>
+        그 순간, 방청석 한쪽에서 진범이 조용히 미소를 지으며 자리에서 일어났다. 그는 유유히 법정을 빠져나갔다.<br><br>
+        <strong style="color:#e74c3c">사건은 미궁에 빠졌다.</strong> 박태준 감독의 죽음은 영원히 자살로 기록될 것이다.<br><br>
+        <em>결정적 단서를 놓쳤다. 다시 처음부터 수사해보겠는가?</em>
+      `;
+    }
   }
 }
 
@@ -882,7 +916,7 @@ const QUESTIONS = [
     text: '"화장대 서랍과 변기에서 발견된 서류들에 대해 설명해주시겠습니까?"',
     testimony: '그 서류들... 박 감독이 제 약점을 잡고 협박해서 강제로 맺게 한 노예계약서예요! 8시 30분에 감독 방에 그걸 훔치러 갔다가 시체를 보고 눈이 뒤집혀서, 서류만 들고 도망쳐 나와 화장실 변기에 버린 거예요! 하지만 난 절대 안 죽였어요!',
     isLocked: true,
-    unlockNeeds: ['32', '52']
+    unlockNeeds: ['A', '52']
   },
   {
     id: 'Q_JW_01',
@@ -901,16 +935,15 @@ let currentDeskSuspect = 'choi';
 // 해금 조건 체크 — 획득한 아이템 기준으로 질문 isLocked 갱신
 function checkQuestionUnlocks() {
   const acquiredIds = new Set(G.inventory.map(c => String(c.id)));
-  let anyChanged = false;
   QUESTIONS.forEach(q => {
     if (!q.isLocked) return;
     const allMet = q.unlockNeeds.every(need => acquiredIds.has(String(need)));
     if (allMet) {
       q.isLocked = false;
-      anyChanged = true;
+      showNotif(`🔓 새 질문 해금: ${q.suspectName}에게 질문할 수 있습니다!`);
     }
   });
-  if (anyChanged) renderDeskQuestions();
+  renderDeskQuestions();
 }
 
 // 심문 데스크 탭 초기화
